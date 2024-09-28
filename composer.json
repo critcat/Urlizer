@@ -1,5 +1,5 @@
 {
-    "name": "aferrandini/urlizer",
+    "name": "critcat/urlizer",
     "type": "library",
     "description": "Library for urlizer",
     "keywords": ["url", "urlizer"],
@@ -13,10 +13,10 @@
             }
         ],
     "require": {
-            "php": ">=7.4"
+            "php": "^7.4"
         },
     "autoload": {
-            "psr-0": { "Ferrandini": "" }
+            "psr-0": { "Critcat": "" }
         },
-    "target-dir": "Ferrandini"
+    "target-dir": "Critcat"
 }
