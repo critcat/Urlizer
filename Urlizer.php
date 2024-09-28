@@ -30,11 +30,11 @@ class Urlizer
      *
      * By bmorel at ssi dot fr
      *
-     * @param  string $string
-     * @return boolean $bool
+     * @param string $string
+     * @return bool $bool
      */
-    public static function seemsUtf8($string)
-    {
+    public static function seemsUtf8(string $string): bool
+	{
         for ($i = 0; $i < strlen($string); $i++) {
             if (ord($string[$i]) < 0x80) continue; # 0bbbbbbb
             elseif ((ord($string[$i]) & 0xE0) == 0xC0) $n=1; # 110bbbbb
@@ -54,11 +54,11 @@ class Urlizer
     /**
      * Remove any illegal characters, accents, etc.
      *
-     * @param  string $string  String to unaccent
+     * @param string $string  String to unaccent
      * @return string $string  Unaccented string
      */
-    public static function unaccent($string)
-    {
+    public static function unaccent(string $string): string
+	{
         if (!preg_match('/[\x80-\xff]/', $string)) {
             return $string;
         }
@@ -208,12 +208,12 @@ class Urlizer
      * @param string (default = ?) Character use if character unknown
      * @return string US-ASCII string
      */
-    public static function utf8ToAscii($str, $unknown = '?')
-    {
+    public static function utf8ToAscii($str, $unknown = '?'): string
+	{
         static $UTF8_TO_ASCII;
 
         if (strlen($str) == 0) {
-            return;
+            return '';
         }
 
         preg_match_all('/.{1}|[^\x00]{1,1}$/us', $str, $ar);
@@ -221,13 +221,13 @@ class Urlizer
 
         foreach ($chars as $i => $c) {
             $ud = 0;
-            if (ord($c{0})>=0 && ord($c{0})<=127) { continue; } // ASCII - next please
-            if (ord($c{0})>=192 && ord($c{0})<=223) { $ord = (ord($c{0})-192)*64 + (ord($c{1})-128); }
-            if (ord($c{0})>=224 && ord($c{0})<=239) { $ord = (ord($c{0})-224)*4096 + (ord($c{1})-128)*64 + (ord($c{2})-128); }
-            if (ord($c{0})>=240 && ord($c{0})<=247) { $ord = (ord($c{0})-240)*262144 + (ord($c{1})-128)*4096 + (ord($c{2})-128)*64 + (ord($c{3})-128); }
-            if (ord($c{0})>=248 && ord($c{0})<=251) { $ord = (ord($c{0})-248)*16777216 + (ord($c{1})-128)*262144 + (ord($c{2})-128)*4096 + (ord($c{3})-128)*64 + (ord($c{4})-128); }
-            if (ord($c{0})>=252 && ord($c{0})<=253) { $ord = (ord($c{0})-252)*1073741824 + (ord($c{1})-128)*16777216 + (ord($c{2})-128)*262144 + (ord($c{3})-128)*4096 + (ord($c{4})-128)*64 + (ord($c{5})-128); }
-            if (ord($c{0})>=254 && ord($c{0})<=255) { $chars{$i} = $unknown; continue; } //error
+            if (ord($c[0])>=0 && ord($c[0])<=127) { continue; } // ASCII - next please
+            if (ord($c[0])>=192 && ord($c[0])<=223) { $ord = (ord($c[0])-192)*64 + (ord($c[1])-128); }
+            if (ord($c[0])>=224 && ord($c[0])<=239) { $ord = (ord($c[0])-224)*4096 + (ord($c[1])-128)*64 + (ord($c[2])-128); }
+            if (ord($c[0])>=240 && ord($c[0])<=247) { $ord = (ord($c[0])-240)*262144 + (ord($c[1])-128)*4096 + (ord($c[2])-128)*64 + (ord($c[3])-128); }
+            if (ord($c[0])>=248 && ord($c[0])<=251) { $ord = (ord($c[0])-248)*16777216 + (ord($c[1])-128)*262144 + (ord($c[2])-128)*4096 + (ord($c[3])-128)*64 + (ord($c[4])-128); }
+            if (ord($c[0])>=252 && ord($c[0])<=253) { $ord = (ord($c[0])-252)*1073741824 + (ord($c[1])-128)*16777216 + (ord($c[2])-128)*262144 + (ord($c[3])-128)*4096 + (ord($c[4])-128)*64 + (ord($c[5])-128); }
+            if (ord($c[0])>=254 && ord($c[0])<=255) { $chars[$i] = $unknown; continue; } //error
 
             $bank = $ord >> 8;
 
@@ -242,9 +242,9 @@ class Urlizer
 
             $newchar = $ord & 255;
             if (array_key_exists($newchar, $UTF8_TO_ASCII[$bank])) {
-                $chars{$i} = $UTF8_TO_ASCII[$bank][$newchar];
+                $chars[$i] = $UTF8_TO_ASCII[$bank][$newchar];
             } else {
-                $chars{$i} = $unknown;
+                $chars[$i] = $unknown;
             }
         }
 
@@ -258,8 +258,8 @@ class Urlizer
      * @param string $separator
      * @return string
      */
-    public static function urlize($text, $separator = '-')
-    {
+    public static function urlize(string $text, string $separator = '-'): string
+	{
         $text = self::unaccent($text);
         return self::postProcessText($text, $separator);
     }
@@ -271,8 +271,8 @@ class Urlizer
      * @param string $separator
      * @return string $text
      */
-    public static function transliterate($text, $separator = '-')
-    {
+    public static function transliterate(string $text, string $separator = '-'): string
+	{
         if (preg_match('/[\x80-\xff]/', $text) && self::validUtf8($text)) {
             $text = self::utf8ToAscii($text);
         }
@@ -288,8 +288,8 @@ class Urlizer
      * @return boolean true if valid
      * @see http://hsivonen.iki.fi/php-utf8/
      */
-    public static function validUtf8($str)
-    {
+    public static function validUtf8($str): bool
+	{
         $mState = 0;     // cached expected number of octets after the current octet
         // until the beginning of the next UTF8 character sequence
         $mUcs4  = 0;     // cached Unicode character
@@ -297,7 +297,7 @@ class Urlizer
 
         $len = strlen($str);
         for ($i = 0; $i < $len; $i++) {
-            $in = ord($str{$i});
+            $in = ord($str[$i]);
             if ($mState == 0) {
                 // When mState is zero we expect either a US-ASCII character or a
                 // multi-octet sequence.
@@ -400,8 +400,8 @@ class Urlizer
      * @param string $separator
      * @return string
      */
-    private static function postProcessText($text, $separator)
-    {
+    private static function postProcessText(string $text, string $separator): string
+	{
         if (function_exists('mb_strtolower')) {
             $text = mb_strtolower($text);
         } else {
